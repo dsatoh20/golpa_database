@@ -2,6 +2,8 @@
 
 import requests
 from bs4 import BeautifulSoup
+import os
+import csv
 
 # 取得したいデータ
 # items = ["メーカー", "モデル", "販売価格", "クラブ種別", "番手", "シャフト", "フレックス", "年式", "ヘッドロフト角(°)", "クラブ重量(g)", "ヘッドライ角(°)", "利き手", "ヘッド体積(cc)", "シャフト長(インチ)", "性別"]
@@ -57,16 +59,30 @@ def fetch_golf_club_data(url):
     }
     # スペック、メーカーカタログ情報、取り扱い店舗情報を取得
     club = club | fetch_from_table(soup, 'desc_tbl_')
-    print(club)
     return club
 
+def save_to_csv(clubs, filename):
+    if not clubs:
+        return
+    
+    headers = clubs[0].keys()
+    with open(filename, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.DictWriter(f, fieldnames=headers)
+        writer.writeheader()
+        for row in clubs:
+            writer.writerow(row)
 
-clubs = []
-i = 1
-urls = get_product_urls(first_url)
-for url in urls:
-    print(f"{i}/{len(urls)}本目を読み取り中")
-    clubs.append(fetch_golf_club_data(url))
-    i += 1
+cwd = os.getcwd()
+
+if __name__=="__main__":
+    
+    clubs = []
+    i = 1
+    urls = get_product_urls(first_url)
+    for url in urls:
+        print(f"{i}/{len(urls)}本目を読み取り中")
+        clubs.append(fetch_golf_club_data(url))
+        i += 1
+    save_to_csv(clubs, os.path.join(cwd, "club_database.csv"))
 
 print("----done!!")

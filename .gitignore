@@ -1,1 +1,7 @@
 golpa_venv/
+*.c
+*.so
+*.csv
+*.pyx
+build/
+.main.py
